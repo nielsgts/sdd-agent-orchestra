@@ -1,0 +1,22 @@
+{
+    "name": "read_project_file",
+    "description": "Read a file from the project directory (all file paths are relative to ./project/)",
+    "type": "internal",
+    "goFunction": "toolInternalReadFile",
+    "terminating": false,
+    "internalParameters": {
+        "baseDir": "{{ .Config.ProjectDir }}"
+    },
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "path": {
+                "type": "string",
+                "description": "The path of the file relative to the project directory"
+            }
+        },
+        "required": [
+            "path"
+        ]
+    }
+}

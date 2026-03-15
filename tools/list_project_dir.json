@@ -1,0 +1,17 @@
+{
+    "name": "list_project_dir",
+    "description": "Lists all files in the project directory (all file paths are relative to ./project/)",
+    "type": "internal",
+    "goFunction": "toolInternalListDir",
+    "terminating": false,
+    "internalParameters": {
+        "baseDir": "{{ .Config.ProjectDir }}"
+    },
+    "parameters": {
+        "type": "object",
+        "properties": {
+        },
+        "required": [
+        ]
+    }
+}

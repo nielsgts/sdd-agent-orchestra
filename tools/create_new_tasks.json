@@ -1,0 +1,21 @@
+{
+    "name": "create_new_tasks",
+    "description": "Write new tasks",
+    "type": "internal",
+    "goFunction": "toolInternalTaskNew",
+    "terminating": true,
+    "internalParameters": {
+    },
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "file_content": {
+                "type": "string",
+                "description": "The description of the tasks"
+            }
+        },
+        "required": [
+            "file_content"
+        ]
+    }
+}

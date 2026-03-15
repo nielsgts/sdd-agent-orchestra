@@ -1,0 +1,27 @@
+{
+    "description": "Generate a testing specification based on the requirements and the design",
+    "parameters": {
+        "name": {
+            "description": "Name of the feature",
+            "default": "unnamed"
+        }
+    },
+    "systemPromptFile": "tests-for-feature.md",
+    "inputPaths": {
+        "feature-requirements": {
+            "path": "{{ .Config.FeatureDir }}/{{ .Parameters.name }}/requirements.md",
+            "description": "The requirements for the new feature",
+            "language": "markdown"
+        },
+        "feature-design": {
+            "path": "{{ .Config.FeatureDir }}/{{ .Parameters.name }}/design.md",
+            "description": "The design for the new feature",
+            "language": "markdown"
+        }
+    },
+    "outputPath": "{{ .Config.FeatureDir }}/{{ .Parameters.name }}/tests.md",
+    "tools": ["write_result_file", "ask_question", "list_project_dir", "read_project_file"],
+    "ruleFiles": [],
+    "onNoFunctionCall": "use-tool-to-save.md",
+    "model": "default"
+}

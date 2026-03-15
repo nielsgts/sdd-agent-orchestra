@@ -1,0 +1,16 @@
+{
+    "name": "complete_task",
+    "description": "Mark the current task as completed",
+    "type": "internal",
+    "goFunction": "toolInternalTaskComplete",
+    "terminating": true,
+    "internalParameters": {
+    },
+    "parameters": {
+        "type": "object",
+        "properties": {
+        },
+        "required": [
+        ]
+    }
+}

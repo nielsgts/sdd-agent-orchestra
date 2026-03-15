@@ -1,0 +1,21 @@
+{
+    "name": "ask_question",
+    "description": "You (the assistent) can ask the user a question about something that you want to have specified",
+    "type": "internal",
+    "goFunction": "toolInternalAskQuestion",
+    "terminating": false,
+    "internalParameters": {
+    },
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "question": {
+                "type": "string",
+                "description": "The question you want to ask"
+            }
+        },
+        "required": [
+            "question"
+        ]
+    }
+}

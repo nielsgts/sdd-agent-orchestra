@@ -1,0 +1,28 @@
+{
+    "description": "Merge a design.md file of a new feature into the system specs.",
+    "parameters": {
+        "name": {
+            "description": "Name of the feature",
+            "default": "unnamed"
+        }
+    },
+    "systemPromptFile": "design-merge-feature.md",
+    "inputPaths": {
+        "system-design": {
+            "path": "{{ .Config.SpecDir }}/design.md",
+            "description": "The latest version of the design where the new feature should be added",
+            "language": "markdown"
+        },
+        "feature-design": {
+            "path": "{{ .Config.FeatureDir }}/{{ .Parameters.name }}/design.md",
+            "description": "The design of the new feature that should be added",
+            "language": "markdown"
+        }
+    },
+    "outputPath": "{{ .Config.SpecDir }}/design.md",
+    "outputBackupPath": "{{ .Config.FeatureDir }}/{{ .Parameters.name }}/system-design.md.backup",
+    "tools": ["write_result_file", "ask_question", "list_project_dir", "read_project_file"],
+    "ruleFiles": [],
+    "onNoFunctionCall": "use-tool-to-save.md",
+    "model": "default"
+}

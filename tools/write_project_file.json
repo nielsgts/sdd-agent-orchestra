@@ -1,0 +1,24 @@
+{
+    "name": "write_project_file",
+    "description": "Write a file to the project directory. Required directories will be created is they do not exist yet (all file paths are relative to ./project/)",
+    "type": "internal",
+    "goFunction": "toolInternalWriteProjectFile",
+    "terminating": false,
+    "internalParameters": {
+        "baseDir": "{{ .Config.ProjectDir }}"
+    },
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "path": {
+                "type": "string",
+                "description": "The path of the file relative to the directory ./project/"
+            },
+            "file_content": {
+                "type": "string",
+                "description": "The content of the file that should be written"
+            }
+        },
+        "required": ["path", "file_content"]
+    }
+}

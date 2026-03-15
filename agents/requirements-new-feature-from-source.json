@@ -1,0 +1,30 @@
+{
+    "description": "Analyse an existing (legacy) artifact to reverse-engeneer a requirement for the feature directory.",
+    "parameters": {
+        "name": {
+            "description": "Name of the feature",
+            "default": "unnamed"
+        },
+        "artifactPath": {
+            "description": "The path of the artifact to reverse-engeneer",
+            "default": ""
+        },
+        "language": {
+            "description": "The language of the artifact to reverse-engeneer",
+            "default": ""
+        }
+    },
+    "systemPromptFile": "requirements-new-feature-from-source.md",
+    "inputPaths": {
+        "feature-requirements": {
+            "path": "{{ .Parameters.artifactPath }}",
+            "description": "The requirements for the new feature",
+            "language": "{{ .Parameters.language }}"
+        }
+    },
+    "outputPath": "{{ .Config.FeatureDir }}/{{ .Parameters.name }}/requirements.md",
+    "tools": ["write_result_file", "ask_question"],
+    "ruleFiles": [],
+    "onNoFunctionCall": "use-tool-to-save.md",
+    "model": "default"
+}

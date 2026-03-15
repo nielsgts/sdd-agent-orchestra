@@ -1,0 +1,21 @@
+{
+    "name": "write_result_file",
+    "description": "Writes the results in the output file",
+    "type": "internal",
+    "goFunction": "toolInternalWriteFile",
+    "terminating": true,
+    "internalParameters": {
+    },
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "file_content": {
+                "type": "string",
+                "description": "The content of the file"
+            }
+        },
+        "required": [
+            "file_content"
+        ]
+    }
+}

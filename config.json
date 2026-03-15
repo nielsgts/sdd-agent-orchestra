@@ -1,0 +1,14 @@
+{
+    "agentDir": "agents",
+    "docsDir": "project/docs",
+    "featureDir": "features",
+    "modelDir": "models",
+    "projectDir": "project",
+    "promptDir": "prompts",
+    "ruleDir": "rules",
+    "specDir": "specs",
+    "srcDir": "project/src",
+    "testDir": "project/test",
+    "toolDir": "tools",
+    "artifactLogPath": "artifact.log"
+}

@@ -1,0 +1,28 @@
+{
+    "description": "Merge a requirements.md file of a new feature into the system specs.",
+    "parameters": {
+        "name": {
+            "description": "Name of the feature",
+            "default": "unnamed"
+        }
+    },
+    "systemPromptFile": "requirements-merge-feature.md",
+    "inputPaths": {
+        "system-requirements": {
+            "path": "{{ .Config.SpecDir }}/requirements.md",
+            "description": "The latest version of the requirements where the new feature should be added",
+            "language": "markdown"
+        },
+        "feature-requirements": {
+            "path": "{{ .Config.FeatureDir }}/{{ .Parameters.name }}/requirements.md",
+            "description": "The requirements of the new feature that should be added",
+            "language": "markdown"
+        }
+    },
+    "outputPath": "{{ .Config.SpecDir }}/requirements.md",
+    "outputBackupPath": "{{ .Config.FeatureDir }}/{{ .Parameters.name }}/system-requirements.md.backup",
+    "tools": ["write_result_file", "ask_question"],
+    "ruleFiles": [],
+    "onNoFunctionCall": "use-tool-to-save.md",
+    "model": "default"
+}
