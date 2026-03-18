@@ -15,6 +15,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 	"text/template"
@@ -85,18 +86,18 @@ type Message struct {
 }
 
 type ToolFile struct {
-	Name               string            `json:"name"`
-	Description        string            `json:"description"`
-	Type               string            `json:"type"`
-	GoFunction         string            `json:"goFunction"`
-	Terminating        bool              `json:"terminating"`
-	InternalParameters map[string]string `json:"internalParameters"`
-	Parameters         map[string]any    `json:"parameters"`
-	Connection         string            `json:"connection"`
-	Command            string            `json:"command"`
-	Args               []string          `json:"args"`
-	DoNotUseTheseTools []string          `json:"doNotUseTheseTools"`
-	UseOnlyTheseTools  []string          `json:"useOnlyTheseTools"`
+	Name               string         `json:"name"`
+	Description        string         `json:"description"`
+	Type               string         `json:"type"`
+	GoFunction         string         `json:"goFunction"`
+	Terminating        bool           `json:"terminating"`
+	InternalParameters map[string]any `json:"internalParameters"`
+	Parameters         map[string]any `json:"parameters"`
+	Connection         string         `json:"connection"`
+	Command            string         `json:"command"`
+	Args               []string       `json:"args"`
+	DoNotUseTheseTools []string       `json:"doNotUseTheseTools"`
+	UseOnlyTheseTools  []string       `json:"useOnlyTheseTools"`
 }
 
 type Tool struct {
@@ -286,12 +287,25 @@ func toolInternalAskQuestion(argumentsString string) (string, error) {
 	return input, nil
 }
 
-func toolInternalListDir(baseDir string) ToolFunction {
+func toolInternalListDir(parameters map[string]any, agent AgentContext) ToolFunction {
 	return func(argumentsString string) (string, error) {
 		//		var arguments map[string]any
 		//		json.Unmarshal([]byte(argumentsString), &arguments)
 		//		basePath := path.Clean(strings.Replace(arguments["path"].(string), "\\", "/", -1))
-
+		baseDir, ok := parameters["baseDir"].(string)
+		if !ok {
+			return "", fmt.Errorf("toolInternalListDir: baseDir parameter is missing or not a string")
+		}
+		baseDir, err := parseTemplate(baseDir, agent)
+		if err != nil {
+			return "", fmt.Errorf("toolInternalListDir: parseTemplate for baseDir '%s' failed: %v", baseDir, err)
+		}
+		var ignoreList []string
+		if ignore, ok := parameters["ignore"].([]any); ok {
+			for _, item := range ignore {
+				ignoreList = append(ignoreList, fmt.Sprint(item))
+			}
+		}
 		basePath := "."
 		root, err := os.OpenRoot(baseDir)
 		if err != nil {
@@ -309,6 +323,9 @@ func toolInternalListDir(baseDir string) ToolFunction {
 		for {
 			var dir string
 			dir, dirs = dirs[0], dirs[1:]
+			if slices.Contains(ignoreList, dir) {
+				continue
+			}
 			entries, err := fs.ReadDir(root.FS(), dir)
 			if err != nil {
 				return "", fmt.Errorf("toolInternalListDir: ReadDir for path: '%s' failed: %v", dir, err)
@@ -322,7 +339,7 @@ func toolInternalListDir(baseDir string) ToolFunction {
 				}
 
 			}
-			if len(entries) <= 0 {
+			if len(entries) <= 0 && dir != "." {
 				result.WriteString(fmt.Sprintf("| %s |  |  | true |\n", dir))
 			}
 			if len(dirs) <= 0 {
@@ -535,11 +552,11 @@ func main() {
 			} else if toolFile.GoFunction == "toolInternalAskQuestion" {
 				tool.Function = toolInternalAskQuestion
 			} else if toolFile.GoFunction == "toolInternalListDir" {
-				tool.Function = toolInternalListDir(check(parseTemplate(tool.ToolFile.InternalParameters["baseDir"], agent)))
+				tool.Function = toolInternalListDir(tool.ToolFile.InternalParameters, agent)
 			} else if toolFile.GoFunction == "toolInternalReadFile" {
-				tool.Function = toolInternalReadFile(check(parseTemplate(tool.ToolFile.InternalParameters["baseDir"], agent)))
+				tool.Function = toolInternalReadFile(check(parseTemplate(tool.ToolFile.InternalParameters["baseDir"].(string), agent)))
 			} else if toolFile.GoFunction == "toolInternalWriteProjectFile" {
-				tool.Function = toolInternalWriteFile(check(parseTemplate(tool.ToolFile.InternalParameters["baseDir"], agent)), agent.ArtifactLog)
+				tool.Function = toolInternalWriteFile(check(parseTemplate(tool.ToolFile.InternalParameters["baseDir"].(string), agent)), agent.ArtifactLog)
 			} else if toolFile.GoFunction == "toolInternalTaskComplete" {
 				tool.Function = toolInternalTaskComplete(agent, agent.ArtifactLog)
 			}
@@ -630,6 +647,9 @@ func main() {
 	for _, v := range agent.Tools {
 		tools = append(tools, convertTool(v))
 	}
+	dumpPath := path.Join(agent.Config.FeatureDir, *agent.Parameters["name"], "dumps")
+	runTime := time.Now().UTC().Format("2006-01-02_15-04-05")
+	checkE(os.MkdirAll(dumpPath, os.ModePerm))
 
 	for i := range 1000 {
 		var httpResponse *http.Response
@@ -639,12 +659,12 @@ func main() {
 			Tools: tools,
 		}
 
-		checkE(os.WriteFile("dumps/request_body.json", check(requestBody.MarshalJSON()), 0644))
+		checkE(os.WriteFile(path.Join(dumpPath, runTime+"request_body.json"), check(requestBody.MarshalJSON()), 0644))
 		resp := check(client.Responses.New(context.Background(), requestBody, option.WithResponseInto(&httpResponse)))
 
-		checkE(os.WriteFile("dumps/response.http", check(httputil.DumpResponse(httpResponse, false)), 0644))
-		checkE(os.WriteFile("dumps/request.http", check(httputil.DumpRequestOut(httpResponse.Request, false)), 0644))
-		checkE(os.WriteFile("dumps/response_body.json", []byte(resp.RawJSON()), 0644))
+		checkE(os.WriteFile(path.Join(dumpPath, runTime+"response.http"), check(httputil.DumpResponse(httpResponse, false)), 0644))
+		checkE(os.WriteFile(path.Join(dumpPath, runTime+"request.http"), check(httputil.DumpRequestOut(httpResponse.Request, false)), 0644))
+		checkE(os.WriteFile(path.Join(dumpPath, runTime+"response_body.json"), []byte(resp.RawJSON()), 0644))
 
 		function_call := false
 		terminating := false
@@ -703,7 +723,7 @@ func main() {
 		}
 		check := 25
 		if i%check == (check - 1) {
-			fmt.Printf("The Agent performed %d request. Do you want to continue? [Y/n]\n", i+1)
+			fmt.Printf("The Agent performed %d requests. Do you want to continue? [Y/n]\n", i+1)
 			fmt.Print("> ")
 			var input string
 			fmt.Scanln(&input)

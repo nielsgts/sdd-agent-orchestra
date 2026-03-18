@@ -5,7 +5,12 @@
     "goFunction": "toolInternalListDir",
     "terminating": false,
     "internalParameters": {
-        "baseDir": "{{ .Config.ProjectDir }}"
+        "baseDir": "{{ .Config.ProjectDir }}",
+        "ignore": [
+            ".sdd",
+            ".git",
+            "specs"
+        ]
     },
     "parameters": {
         "type": "object",
