@@ -1,0 +1,12 @@
+{
+    "agentDir": ".sdd/agents",
+    "docsDir": "docs",
+    "featureDir": "specs",
+    "modelDir": ".sdd/models",
+    "projectDir": ".",
+    "promptDir": ".sdd/prompts",
+    "ruleDir": ".sdd/rules",
+    "specDir": "specs",
+    "toolDir": ".sdd/tools",
+    "artifactLogPath": ".sdd/artifact.log"
+}

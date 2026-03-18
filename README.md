@@ -1,6 +1,6 @@
 # SDD Agent Orchestra
 
-A Go-based system for orchestrating AI agents to automate various stages of software development, including requirements gathering, design, implementation, testing, and task management.
+A Go-based system for orchestrating AI agents to automate various stages of spec driven development, including requirements gathering, design, implementation, testing, and task management.
 
 ## Features
 
@@ -58,7 +58,7 @@ The default config expects a workflow in this order:
 
 ## Agents
 
-Agents are defined in the `agents/` directory as JSON files. Each agent specifies:
+Agents are defined in the `.sdd/agents/` directory as JSON files. Each agent specifies:
 
 - Description and parameters
 - Prompt files
@@ -68,11 +68,11 @@ Agents are defined in the `agents/` directory as JSON files. Each agent specifie
 
 ## Models
 
-Model configurations are in `models/` directory, specifying API keys, endpoints, etc.
+Model configurations are in `.sdd/models/` directory, specifying API keys, endpoints, etc.
 
 ## Tools
 
-Tools are defined in `tools/` directory, supporting internal Go functions or MCP servers.
+Tools are defined in `.sdd/tools/` directory, supporting internal Go functions or MCP servers.
 
 ## Testing
 

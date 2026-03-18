@@ -502,7 +502,7 @@ func main() {
 	//
 	// Start config
 	//
-	configFile := flag.String("config", "config.json", "path of the config file")
+	configFile := flag.String("config", ".sdd/config.json", "path of the config file")
 	flag.Parse()
 	agents := flag.Args()
 	fmt.Println("Using config:", *configFile)
