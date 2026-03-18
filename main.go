@@ -519,15 +519,20 @@ func main() {
 	//
 	// Start config
 	//
-	configFile := flag.String("config", ".sdd/config.json", "path of the config file")
+	globalParameters := map[string]*string{}
+	globalParameters["config"] = flag.String("config", ".sdd/config.json", "path of the config file")
+	globalParameters["feature"] = flag.String("feature", "", "name of the feature to work on")
+	// TODO: replace name by feature
+	globalParameters["name"] = globalParameters["feature"]
 	flag.Parse()
 	agents := flag.Args()
-	fmt.Println("Using config:", *configFile)
-	config := check(readJSONFile[Config](*configFile))
+	fmt.Println("Using config:", *globalParameters["config"])
+	fmt.Println("Feature:", *globalParameters["feature"])
+	config := check(readJSONFile[Config](*globalParameters["config"]))
 	artifactLogFile := check(os.OpenFile(config.ArtifactLogPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666))
 	defer artifactLogFile.Close()
 
-	agent := AgentContext{Tools: map[string]Tool{}, Parameters: map[string]*string{}, Files: map[string]File{}, Rules: responses.ResponseInputMessageContentListParam{}, GetEnv: getEnv}
+	agent := AgentContext{Tools: map[string]Tool{}, Parameters: globalParameters, Files: map[string]File{}, Rules: responses.ResponseInputMessageContentListParam{}, GetEnv: getEnv}
 	agent.Name = agents[0]
 	agent.Config = config
 	agent.ArtifactLog = log.New(artifactLogFile, agent.Name, log.LstdFlags)
@@ -535,8 +540,12 @@ func main() {
 	agent.Model = check(readJSONFile[Model](path.Join(config.ModelDir, agent.Agent.Model+".json")))
 	agent.Model.APIKey = check(parseTemplate(agent.Model.APIKey, agent))
 	agent.FlagSet = flag.NewFlagSet(agents[0], flag.ExitOnError)
-	for k, v := range agent.Agent.Parameters {
-		agent.Parameters[k] = agent.FlagSet.String(k, v.Default, v.Description)
+	for parameterName, parameterValue := range agent.Agent.Parameters {
+		defaultValue := parameterValue.Default
+		if globalParameter, ok := globalParameters[parameterName]; ok && *globalParameter != "" {
+			defaultValue = *globalParameter
+		}
+		agent.Parameters[parameterName] = agent.FlagSet.String(parameterName, defaultValue, parameterValue.Description)
 	}
 	agent.FlagSet.Parse(agents[1:])
 	agents = agent.FlagSet.Args()
@@ -599,17 +608,18 @@ func main() {
 		option.WithHeader("X-OpenRouter-Categories", "cli-agent"),
 	)
 
-	systemPrompt := check(parseTemplateFile(path.Join(config.PromptDir, check(parseTemplate(agent.Agent.SystemPromptFile, agent))), agent))
-	userPrompt := ""
-
-	agent.Messages = []responses.ResponseInputItemUnionParam{{
-		OfInputMessage: &responses.ResponseInputItemMessageParam{
-			Role: string(responses.EasyInputMessageRoleSystem),
-			Content: responses.ResponseInputMessageContentListParam{
-				responses.ResponseInputContentParamOfInputText(systemPrompt),
+	agent.Messages = []responses.ResponseInputItemUnionParam{}
+	if agent.Agent.SystemPromptFile != "" {
+		systemPrompt := check(parseTemplateFile(path.Join(config.PromptDir, check(parseTemplate(agent.Agent.SystemPromptFile, agent))), agent))
+		agent.Messages = append(agent.Messages, responses.ResponseInputItemUnionParam{
+			OfInputMessage: &responses.ResponseInputItemMessageParam{
+				Role: string(responses.EasyInputMessageRoleSystem),
+				Content: responses.ResponseInputMessageContentListParam{
+					responses.ResponseInputContentParamOfInputText(systemPrompt),
+				},
 			},
-		},
-	}}
+		})
+	}
 	if len(agent.Rules) > 0 {
 		agent.Messages = append(agent.Messages, responses.ResponseInputItemUnionParam{
 			OfInputMessage: &responses.ResponseInputItemMessageParam{
@@ -619,7 +629,7 @@ func main() {
 		})
 	}
 	if agent.Agent.UserPromptFile != "" {
-		userPrompt = check(parseTemplateFile(path.Join(config.PromptDir, check(parseTemplate(agent.Agent.UserPromptFile, agent))), agent))
+		userPrompt := check(parseTemplateFile(path.Join(config.PromptDir, check(parseTemplate(agent.Agent.UserPromptFile, agent))), agent))
 		agent.Messages = append(agent.Messages, responses.ResponseInputItemUnionParam{
 			OfInputMessage: &responses.ResponseInputItemMessageParam{
 				Role: string(responses.EasyInputMessageRoleUser),
@@ -647,8 +657,13 @@ func main() {
 	for _, v := range agent.Tools {
 		tools = append(tools, convertTool(v))
 	}
-	dumpPath := path.Join(agent.Config.FeatureDir, *agent.Parameters["name"], "dumps")
-	runTime := time.Now().UTC().Format("2006-01-02_15-04-05")
+	featureNamePointer, ok := agent.Parameters["name"]
+	featureName := ""
+	if ok {
+		featureName = *featureNamePointer
+	}
+	dumpPath := path.Join(agent.Config.FeatureDir, featureName, "dumps")
+	runTime := time.Now().UTC().Format("2006-01-02_15-04-05_")
 	checkE(os.MkdirAll(dumpPath, os.ModePerm))
 
 	for i := range 1000 {
@@ -659,12 +674,12 @@ func main() {
 			Tools: tools,
 		}
 
-		checkE(os.WriteFile(path.Join(dumpPath, runTime+"request_body.json"), check(requestBody.MarshalJSON()), 0644))
+		checkE(os.WriteFile(path.Join(dumpPath, runTime+agent.Name+"_request_body.json"), check(requestBody.MarshalJSON()), 0644))
 		resp := check(client.Responses.New(context.Background(), requestBody, option.WithResponseInto(&httpResponse)))
 
-		checkE(os.WriteFile(path.Join(dumpPath, runTime+"response.http"), check(httputil.DumpResponse(httpResponse, false)), 0644))
-		checkE(os.WriteFile(path.Join(dumpPath, runTime+"request.http"), check(httputil.DumpRequestOut(httpResponse.Request, false)), 0644))
-		checkE(os.WriteFile(path.Join(dumpPath, runTime+"response_body.json"), []byte(resp.RawJSON()), 0644))
+		checkE(os.WriteFile(path.Join(dumpPath, runTime+agent.Name+"_response.http"), check(httputil.DumpResponse(httpResponse, false)), 0644))
+		checkE(os.WriteFile(path.Join(dumpPath, runTime+agent.Name+"_request.http"), check(httputil.DumpRequestOut(httpResponse.Request, false)), 0644))
+		checkE(os.WriteFile(path.Join(dumpPath, runTime+agent.Name+"_response_body.json"), []byte(resp.RawJSON()), 0644))
 
 		function_call := false
 		terminating := false
@@ -704,7 +719,7 @@ func main() {
 		if !function_call || terminating {
 			if !function_call {
 				if agent.Agent.OnNoFunctionCall != "" {
-					userPrompt = check(parseTemplateFile(path.Join(config.PromptDir, check(parseTemplate(agent.Agent.OnNoFunctionCall, agent))), agent))
+					userPrompt := check(parseTemplateFile(path.Join(config.PromptDir, check(parseTemplate(agent.Agent.OnNoFunctionCall, agent))), agent))
 					agent.Messages = append(agent.Messages, responses.ResponseInputItemUnionParam{
 						OfInputMessage: &responses.ResponseInputItemMessageParam{
 							Role: string(responses.EasyInputMessageRoleUser),

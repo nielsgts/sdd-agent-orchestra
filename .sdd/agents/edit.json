@@ -1,0 +1,17 @@
+{
+    "description": "Ask the assistent to edit files",
+    "parameters": {
+        "message": {
+            "description": "The message for the assistant",
+            "default": "Use the ask_question tool to interact with me."
+        }
+    },
+    "systemPromptFile": "",
+    "userPromptFile": "chat.md",
+    "inputPaths": {},
+    "outputPath": "",
+    "tools": ["ask_question", "list_project_dir", "read_project_file", "write_project_file"],
+    "ruleFiles": [],
+    "onNoFunctionCall": "",
+    "model": "default"
+}
