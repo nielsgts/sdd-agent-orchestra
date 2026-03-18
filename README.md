@@ -1,3 +1,7 @@
+# SDD Agent Orchestra Template
+
+This git branch holds a project templete for SDD Agent Orchestra.
+
 # SDD Agent Orchestra
 
 A Go-based system for orchestrating AI agents to automate various stages of spec driven development, including requirements gathering, design, implementation, testing, and task management.
@@ -26,6 +30,12 @@ A Go-based system for orchestrating AI agents to automate various stages of spec
    ```bash
    go build
    ```
+5. Clone the template:
+   ```bash
+   cd ..
+   git clone -b main https://github.com/nielsgts/sdd-agent-orchestra.git project
+   cd project
+   ```
 
 ## Configuration
 
@@ -38,13 +48,13 @@ The agents are not fixed but can be changed and added.
 Run an agent with:
 
 ```bash
-./sdd-agent-orchestra -config config.json <agent_name> [parameters]
+../sdd-agent-orchestra/sdd-agent-orchestra [-feature <feature-name>] <agent_name> [parameters]
 ```
 
 For example, to run the requirements-new-feature agent:
 
 ```bash
-./sdd-agent-orchestra requirements-new-feature -name "my-feature" -message "Add user authentication"
+../sdd-agent-orchestra/sdd-agent-orchestra -feature "my-feature" requirements-new-feature -message "Add user authentication"
 ```
 
 The default config expects a workflow in this order:
@@ -70,17 +80,17 @@ Agents are defined in the `.sdd/agents/` directory as JSON files. Each agent spe
 
 Model configurations are in `.sdd/models/` directory, specifying API keys, endpoints, etc.
 
+## Prompts
+
+Prompts are defined in `.sdd/prompts/` directory, for use by the Agents.
+
+## Rules
+
+Rules are defined in `.sdd/rules/` directory, used for context that is relevat for multiple agents
+
 ## Tools
 
 Tools are defined in `.sdd/tools/` directory, supporting internal Go functions or MCP servers.
-
-## Testing
-
-Run tests with:
-
-```bash
-go test
-```
 
 ## Contributing
 
@@ -88,7 +98,7 @@ Contributions are welcome. Please ensure code follows Go best practices and incl
 
 ## Roadmap
 
-Features that should be implemented next
+Features that are planed to be implemented next:
 - workflow configuration
 
 ## License
