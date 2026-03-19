@@ -324,6 +324,9 @@ func toolInternalListDir(parameters map[string]any, agent AgentContext) ToolFunc
 			var dir string
 			dir, dirs = dirs[0], dirs[1:]
 			if slices.Contains(ignoreList, dir) {
+				if len(dirs) <= 0 {
+					break
+				}
 				continue
 			}
 			entries, err := fs.ReadDir(root.FS(), dir)
