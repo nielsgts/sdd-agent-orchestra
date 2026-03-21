@@ -1,7 +1,7 @@
 {
     "description": "Implement the next Task",
     "parameters": {
-        "name": {
+        "feature": {
             "description": "Name of the feature",
             "default": "unnamed"
         }
@@ -10,7 +10,7 @@
     "userPromptFile": "next-task.md",
     "inputPaths": {
         "feature-requirements": {
-            "path": "{{ .Config.FeatureDir }}/{{ .Parameters.name }}/requirements.md",
+            "path": "{{ .Config.FeatureDir }}/{{ .Parameters.feature }}/requirements.md",
             "description": "The requirements for the new feature",
             "language": "markdown"
         },
@@ -20,17 +20,17 @@
             "language": "markdown"
         },
         "feature-design": {
-            "path": "{{ .Config.FeatureDir }}/{{ .Parameters.name }}/design.md",
+            "path": "{{ .Config.FeatureDir }}/{{ .Parameters.feature }}/design.md",
             "description": "The design for the new feature",
             "language": "markdown"
         },
         "feature-tests": {
-            "path": "{{ .Config.FeatureDir }}/{{ .Parameters.name }}/tests.md",
+            "path": "{{ .Config.FeatureDir }}/{{ .Parameters.feature }}/tests.md",
             "description": "The testing specification for the new feature",
             "language": "markdown"
         }
     },
-    "outputPath": "{{ .Config.FeatureDir }}/{{ .Parameters.name }}/completed_tasks/",
+    "outputPath": "{{ .Config.FeatureDir }}/{{ .Parameters.feature }}/completed_tasks/",
     "outputBackupPath": "",
     "tools": ["complete_task", "ask_question", "list_project_dir", "read_project_file", "write_project_file"],
     "ruleFiles": [],

@@ -1,4 +1,4 @@
-The name of the feature you are currently working on is: {{ index .Parameters "name" }}
+The name of the feature you are currently working on is: {{ .Parameters.feature }}
 
 USER REQUEST:
-{{ index .Parameters "message" }}
+{{ .Parameters.message }}

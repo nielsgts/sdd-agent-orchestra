@@ -1,7 +1,7 @@
 {
     "description": "Analyse an existing (legacy) artifact to reverse-engeneer a requirement for the feature directory.",
     "parameters": {
-        "name": {
+        "feature": {
             "description": "Name of the feature",
             "default": "unnamed"
         },
@@ -22,7 +22,7 @@
             "language": "{{ .Parameters.language }}"
         }
     },
-    "outputPath": "{{ .Config.FeatureDir }}/{{ .Parameters.name }}/requirements.md",
+    "outputPath": "{{ .Config.FeatureDir }}/{{ .Parameters.feature }}/requirements.md",
     "tools": ["write_result_file", "ask_question"],
     "ruleFiles": [],
     "onNoFunctionCall": "use-tool-to-save.md",

@@ -494,7 +494,7 @@ func toolInternalCallMcp(session *mcp.ClientSession, name string) ToolFunction {
 }
 
 func (agent AgentContext) NextTaskFilePaths() ([]string, error) {
-	taskGlob := path.Join(agent.Config.FeatureDir, *agent.Parameters["name"], "task_*")
+	taskGlob := path.Join(agent.Config.FeatureDir, *agent.Parameters["feature"], "task_*")
 	taskPaths, err := filepath.Glob(taskGlob)
 	if err != nil {
 		return []string{}, fmt.Errorf("NextTaskName: Glob of '%s' failed: %v", taskGlob, err)
@@ -525,8 +525,6 @@ func main() {
 	globalParameters := map[string]*string{}
 	globalParameters["config"] = flag.String("config", ".sdd/config.json", "path of the config file")
 	globalParameters["feature"] = flag.String("feature", "", "name of the feature to work on")
-	// TODO: replace name by feature
-	globalParameters["name"] = globalParameters["feature"]
 	flag.Parse()
 	agents := flag.Args()
 	fmt.Println("Using config:", *globalParameters["config"])
@@ -660,7 +658,7 @@ func main() {
 	for _, v := range agent.Tools {
 		tools = append(tools, convertTool(v))
 	}
-	featureNamePointer, ok := agent.Parameters["name"]
+	featureNamePointer, ok := agent.Parameters["feature"]
 	featureName := ""
 	if ok {
 		featureName = *featureNamePointer

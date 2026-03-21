@@ -38,13 +38,13 @@ The agents are not fixed but can be changed and added.
 Run an agent with:
 
 ```bash
-./sdd-agent-orchestra -config config.json <agent_name> [parameters]
+./sdd-agent-orchestra [-config .sdd/config.json] [-feature <feature_name>] <agent_name> [parameters]
 ```
 
 For example, to run the requirements-new-feature agent:
 
 ```bash
-./sdd-agent-orchestra requirements-new-feature -name "my-feature" -message "Add user authentication"
+./sdd-agent-orchestra requirements-new-feature -feature "my-feature" -message "Add user authentication"
 ```
 
 The default config expects a workflow in this order:

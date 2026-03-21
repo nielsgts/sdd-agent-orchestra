@@ -1,7 +1,7 @@
 {
     "description": "Merge a requirements.md file of a new feature into the system specs.",
     "parameters": {
-        "name": {
+        "feature": {
             "description": "Name of the feature",
             "default": "unnamed"
         }
@@ -14,13 +14,13 @@
             "language": "markdown"
         },
         "feature-requirements": {
-            "path": "{{ .Config.FeatureDir }}/{{ .Parameters.name }}/requirements.md",
+            "path": "{{ .Config.FeatureDir }}/{{ .Parameters.feature }}/requirements.md",
             "description": "The requirements of the new feature that should be added",
             "language": "markdown"
         }
     },
     "outputPath": "{{ .Config.SpecDir }}/requirements.md",
-    "outputBackupPath": "{{ .Config.FeatureDir }}/{{ .Parameters.name }}/system-requirements.md.backup",
+    "outputBackupPath": "{{ .Config.FeatureDir }}/{{ .Parameters.feature }}/system-requirements.md.backup",
     "tools": ["write_result_file", "ask_question"],
     "ruleFiles": [],
     "onNoFunctionCall": "use-tool-to-save.md",

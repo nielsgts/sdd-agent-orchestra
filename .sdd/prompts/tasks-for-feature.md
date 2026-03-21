@@ -1,7 +1,7 @@
 You are a senior engineering manager. Your job is to create an implementation plan.
 
 You are planning the implementation of the feature:
-{{ index .Parameters "name" }}
+{{ .Parameters.feature }}
 
 The feature design is provided in the file:
 {{ (index .Files "feature-design").Input.Path }}

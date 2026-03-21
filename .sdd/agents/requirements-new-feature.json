@@ -1,7 +1,7 @@
 {
     "description": "Add a new feature into the feature directory.",
     "parameters": {
-        "name": {
+        "feature": {
             "description": "Name of the feature",
             "default": "unnamed"
         },
@@ -13,7 +13,7 @@
     "systemPromptFile": "requirements-new-feature.md",
     "userPromptFile": "user-prompt.md",
     "inputPaths": {},
-    "outputPath": "{{ .Config.FeatureDir }}/{{ .Parameters.name }}/requirements.md",
+    "outputPath": "{{ .Config.FeatureDir }}/{{ .Parameters.feature }}/requirements.md",
     "tools": ["write_result_file", "ask_question"],
     "ruleFiles": [],
     "onNoFunctionCall": "use-tool-to-save.md",
